@@ -6,7 +6,6 @@ fn main() {
     println!("GUESS THE NUMBER!"); //the "!" means that it's a macro
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
-    println!("The secret number is: {secret_number}");
 
     loop {
         println!("Please input your guess:");
@@ -29,16 +28,28 @@ fn main() {
         //expect crashes the program and display a message if the Result is an Err value. Result's variants can be Ok or Err.
         //without the .expect, the program compiles but ggives you a warning.
 
-        let guess: u32 = guess.trim().parse().expect("Please type a number!");
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Please enter a number.");
+                continue;
+            }
+        };
         //trim eliminates the whitespace at the beginning and end of the string. eliminates \n\r.
         //parse parses a string into a number.
+        //match checks the Result of parse. if it's Ok, it returns the number. if it's Err, it prints a message and continues the loop.
+        //the _ is a catchall value. it matches any value.
 
         println!("You guessed: {guess}");
 
         match guess.cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
-            Ordering::Equal => println!("You win!"),
+            Ordering::Equal => {
+                println!("You win!");
+                println!("The secret number is: {secret_number}");
+                break;
+            }
         }
     }
 }
